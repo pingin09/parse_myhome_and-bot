@@ -3,6 +3,7 @@ from collections import namedtuple
 
 import bs4
 import requests
+import urllib.parse
 
 
 class MyhomeParser:
@@ -18,6 +19,19 @@ class MyhomeParser:
         url = 'https://www.myhome.ge/ru/s'
         r = self.session.get(url, params=params)
         return r.text
+
+    def get_pagination_limit(self, params):
+        text = self.get_page(params, page=2)
+        soup = bs4.BeautifulSoup(text, 'lxml')
+        pages = soup.select('a.page-link')
+        last_page = pages[-1]
+        href = last_page.get('href')
+        r = urllib.parse.urlparse(href)
+        s = ''
+        for i in r[2]:
+            if i.isdigit():
+                s += i
+        return int(s)
 
     def get_blocks(self, params):
         text = self.get_page(params, page=2)
@@ -114,10 +128,11 @@ class Block(InnerBlock):
 
 def main():
     x = data()
-    params = x.formats(input('Введите город поиска'), input('Введите регион поиска'), input('Введите тип объявлений'),
-                       input('Введите тип собственности'), input('Собственник'))
+    params = x.formats('Тбилиси', 'Глдани', 'Аренда',
+                       'Квартиры', 'Собственник')
     p = MyhomeParser()
     p.get_blocks(params)
+    p.get_pagination_limit(params)
 
 
 if __name__ == '__main__':

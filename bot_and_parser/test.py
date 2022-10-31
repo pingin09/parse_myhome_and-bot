@@ -11,17 +11,17 @@ class MyhomeParser:
         self.session = requests.Session()
         self.session.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'}
-
+        self.count = 0
     def get_page(self, params, page: int = None):
         if page and page > 1:
-            params['p'] = page
+            params['Page'] = page
 
         url = 'https://www.myhome.ge/ru/s'
         r = self.session.get(url, params=params)
         return r.text
 
     def get_pagination_limit(self, params):
-        text = self.get_page(params, page=2)
+        text = self.get_page(params)
         soup = bs4.BeautifulSoup(text, 'lxml')
         pages = soup.select('a.page-link')
         last_page = pages[-1]
@@ -33,37 +33,48 @@ class MyhomeParser:
                 s += i
         return int(s)
 
-    def get_blocks(self, params):
-        text = self.get_page(params, page=2)
+    def get_blocks(self, params, page: int = None):
+        text = self.get_page(params, page=page)
         soup = bs4.BeautifulSoup(text, 'lxml')
 
         container = soup.select('div.statement-card')
+        block_all = {}
         for item in container:
             block = self.parse_block(item=item)
+            if block not in block_all.items() and block != None:
+                self.count += 1
+                block_all[self.count] = block
+        for i in block_all:
+            print(i)
+            for i1 in range(len(block_all[i])):
+                print(block_all[i][i1])
 
     def parse_block(self, item):
-        url_block = item.select_one('a.card-container')
-        if url_block != None:
+        try:
+            url_block = item.select_one('a.card-container')
             href = url_block.get('href')
             url = href
-            print(href)
-            print()
-        title_block = item.select_one('h5.card-title')
-        if title_block != None:
+            title_block = item.select_one('h5.card-title')
             title = title_block.string.strip()
-            print(title)
-            print()
-        price_block = item.select_one('b.item-price-gel')
-        price_block2 = item.select_one('b.item-price-usd')
-        if price_block != None and price_block2 != None:
+
+            price_block = item.select_one('b.item-price-gel')
+            price_block2 = item.select_one('b.item-price-usd')
             priceD = price_block.string.strip() + ' GEL'
             priceL = price_block2.string.strip() + ' $'
-            print(priceD)
-            print(priceL)
-        date_block = item.select_one('div.statement-date')
-        if date_block != None:
+
+
+            date_block = item.select_one('div.statement-date')
             date = date_block.string.strip()
-            print(date)
+
+            return [title,url,priceL,priceD,date]
+        except AttributeError:
+            return None
+
+    def parse_all(self,params):
+        limit = self.get_pagination_limit(params)
+        print(f'Всего страниц {limit}')
+        for i in range(1, limit +1):
+            self.get_blocks(params, page=i)
 
 
 class data:
@@ -131,8 +142,9 @@ def main():
     params = x.formats('Тбилиси', 'Глдани', 'Аренда',
                        'Квартиры', 'Собственник')
     p = MyhomeParser()
-    p.get_blocks(params)
-    p.get_pagination_limit(params)
+    #p.get_blocks(params)
+    #p.get_pagination_limit(params)
+    p.parse_all(params)
 
 
 if __name__ == '__main__':

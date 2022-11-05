@@ -12,7 +12,6 @@ class MyhomeParser:
         self.session.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
         }
-        self.block_all = []
 
     def get_page(self, params, page: int = None):
         if page and page > 1:
@@ -39,10 +38,13 @@ class MyhomeParser:
         text = self.get_page(params, page=page)
         soup = bs4.BeautifulSoup(text, 'lxml')
         container = soup.select('div.statement-card')
+        all_block = []
         for item in container:
             block = self.parse_block(item=item)
-            if block not in self.block_all and block != None:
-                self.block_all.append(block)
+            if block != None:
+                all_block.append(block)
+
+        return all_block
 
     def parse_block(self, item):
         try:
@@ -67,13 +69,11 @@ class MyhomeParser:
     def parse_all(self, params):
         limit = self.get_pagination_limit(params)
         print(f'Всего страниц {limit}')
+        block_all = []
         for i in range(1, limit + 1):
-            self.get_blocks(params, page=i)
+            block_all += self.get_blocks(params, page=i)
 
-    def print_and_clear_result(self):
-        for i in self.block_all:
-            print(self.block_all.index(i), i)
-        self.block_all.clear()
+        return block_all
 
 
 class Data:
@@ -137,8 +137,9 @@ def main():
                         'Сортировка по цене': 'Да',
                         'Макс - мин цена, валюта': [500, 300, 'Доллар'], 'Собственник': 'Да'})
     p = MyhomeParser()
-    p.parse_all(params)
-    p.print_and_clear_result()
+    block_all = p.parse_all(params)
+    for i in block_all:
+        print(block_all.index(i), i)
 
 
 if __name__ == '__main__':

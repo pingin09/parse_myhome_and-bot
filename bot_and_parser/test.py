@@ -142,8 +142,6 @@ def main():
            'Сортировка по цене': 'Да',
            'Макс - мин цена, валюта': [500, 300, 'Доллар'], 'Собственник': 'Да'})
     p = MyhomeParser()
-    #p.get_blocks(params)
-    #p.get_pagination_limit(params)
     p.parse_all(params)
 
 

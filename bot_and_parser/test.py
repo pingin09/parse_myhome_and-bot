@@ -10,8 +10,9 @@ class MyhomeParser:
     def __init__(self):
         self.session = requests.Session()
         self.session.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'}
-        self.count = 0
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
+        }
+        self.block_all = []
     def get_page(self, params, page: int = None):
         if page and page > 1:
             params['Page'] = page
@@ -38,16 +39,13 @@ class MyhomeParser:
         soup = bs4.BeautifulSoup(text, 'lxml')
 
         container = soup.select('div.statement-card')
-        block_all = {}
         for item in container:
             block = self.parse_block(item=item)
-            if block not in block_all.items() and block != None:
-                self.count += 1
-                block_all[self.count] = block
-        for i in block_all:
-            print(i)
-            for i1 in range(len(block_all[i])):
-                print(block_all[i][i1])
+            if block not in self.block_all and block != None:
+                self.block_all.append(block)
+        for i in self.block_all:
+            print(self.block_all.index(i), i)
+
 
     def parse_block(self, item):
         try:
@@ -76,8 +74,11 @@ class MyhomeParser:
         for i in range(1, limit +1):
             self.get_blocks(params, page=i)
 
+    def clear_result(self):
+        self.block_all.clear()
 
-class data:
+
+class Data:
     def __init__(self):
         self.city = {'Тбилиси':
                          ['Тбилиси', 1996871],
@@ -137,12 +138,14 @@ class Block(InnerBlock):
 
 
 def main():
-    x = data()
+    x = Data()
     params = x.formats({'Город': 'Тбилиси', 'Регион': 'Глдани', 'Тип поиска': 'Аренда', 'Тип жилья': 'Квартира',
            'Сортировка по цене': 'Да',
            'Макс - мин цена, валюта': [500, 300, 'Доллар'], 'Собственник': 'Да'})
     p = MyhomeParser()
     p.parse_all(params)
+    p.clear_result()
+
 
 
 if __name__ == '__main__':

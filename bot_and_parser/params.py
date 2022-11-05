@@ -1,4 +1,4 @@
-class data:
+class Data:
     def __init__(self):
         self.city = {'Тбилиси':
                          ['Тбилиси', 1996871],

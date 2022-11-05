@@ -13,6 +13,7 @@ class MyhomeParser:
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
         }
         self.block_all = []
+
     def get_page(self, params, page: int = None):
         if page and page > 1:
             params['Page'] = page
@@ -37,15 +38,11 @@ class MyhomeParser:
     def get_blocks(self, params, page: int = None):
         text = self.get_page(params, page=page)
         soup = bs4.BeautifulSoup(text, 'lxml')
-
         container = soup.select('div.statement-card')
         for item in container:
             block = self.parse_block(item=item)
             if block not in self.block_all and block != None:
                 self.block_all.append(block)
-        for i in self.block_all:
-            print(self.block_all.index(i), i)
-
 
     def parse_block(self, item):
         try:
@@ -54,27 +51,28 @@ class MyhomeParser:
             url = href
             title_block = item.select_one('h5.card-title')
             title = title_block.string.strip()
-
             price_block = item.select_one('b.item-price-gel')
             price_block2 = item.select_one('b.item-price-usd')
             priceD = price_block.string.strip() + ' GEL'
             priceL = price_block2.string.strip() + ' $'
-
-
             date_block = item.select_one('div.statement-date')
             date = date_block.string.strip()
 
-            return [title,url,priceL,priceD,date]
+            return [title, url, priceL, priceD, date]
+
         except AttributeError:
+
             return None
 
-    def parse_all(self,params):
+    def parse_all(self, params):
         limit = self.get_pagination_limit(params)
         print(f'Всего страниц {limit}')
-        for i in range(1, limit +1):
+        for i in range(1, limit + 1):
             self.get_blocks(params, page=i)
 
-    def clear_result(self):
+    def print_and_clear_result(self):
+        for i in self.block_all:
+            print(self.block_all.index(i), i)
         self.block_all.clear()
 
 
@@ -99,22 +97,18 @@ class Data:
                              'Надзаладеви': 688137211,
                              'Сабуртало': 687602533,
                              'Самгори': 688330506,
-                             'Чугурети': 687618311
-                             }
-                        }
+                             'Чугурети': 687618311}}
         self.type_s = {'Продажа': 1, 'Аренда': 3, 'Аренда посуточно': 7}
         self.type_s_towr = {'Квартира': 1, 'Дома и дачи': 2, 'Коммерческая площадь': 3}
 
     def formats(self, forms):
-        lastForm = {
-            'Keyword': self.city[forms['Город']][0],
-            'cities': self.city[forms['Город']][1],
-            'regions': self.regions[forms['Город']][forms['Регион']],
-            'fullregions': self.regions[forms['Город']][forms['Регион']],
-            'AdType': self.type_s[forms['Тип поиска']],
-            'PrTypeID%5B%5D': self.type_s_towr[forms['Тип жилья']],
-            'SortID': 1,
-        }
+        lastForm = {'Keyword': self.city[forms['Город']][0],
+                    'cities': self.city[forms['Город']][1],
+                    'regions': self.regions[forms['Город']][forms['Регион']],
+                    'fullregions': self.regions[forms['Город']][forms['Регион']],
+                    'AdType': self.type_s[forms['Тип поиска']],
+                    'PrTypeID%5B%5D': self.type_s_towr[forms['Тип жилья']],
+                    'SortID': 1}
         if forms['Собственник'] == 'Да':
             lastForm['OwnerTypeID'] = 1
         if forms['Сортировка по цене'] == 'Да':
@@ -140,12 +134,11 @@ class Block(InnerBlock):
 def main():
     x = Data()
     params = x.formats({'Город': 'Тбилиси', 'Регион': 'Глдани', 'Тип поиска': 'Аренда', 'Тип жилья': 'Квартира',
-           'Сортировка по цене': 'Да',
-           'Макс - мин цена, валюта': [500, 300, 'Доллар'], 'Собственник': 'Да'})
+                        'Сортировка по цене': 'Да',
+                        'Макс - мин цена, валюта': [500, 300, 'Доллар'], 'Собственник': 'Да'})
     p = MyhomeParser()
     p.parse_all(params)
-    p.clear_result()
-
+    p.print_and_clear_result()
 
 
 if __name__ == '__main__':

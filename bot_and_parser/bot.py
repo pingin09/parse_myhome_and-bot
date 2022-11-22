@@ -6,13 +6,13 @@ from telebot import types
 #5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM
 bot = telebot.TeleBot("5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM")
 
-town_list = ['тбилиси', 'кутаиси', 'батуми', 'рустави', 'tbilisi', 'kutaisi', 'batumi', 'rustavi']
+town_list = ['тбилиси', 'кутаиси', 'батуми', 'рустави', 'tbilisi', 'kutaisi', 'batumi', 'rustavi'] #Кобулети, Боржоми, Мцхета, и др. и кнопки
 
 @bot.message_handler(commands=["start"])
 def start(m, res=False):
     bot.send_message(m.chat.id, 'В каком городе вы ищете жилье?')
 
-one_request_dict = {}
+one_request_dict = {} #сформировать словарь ID/one_request_dict
 
 @bot.message_handler(content_types=["text"])
 def handle_town(message):
@@ -97,39 +97,41 @@ def handle_type_of_house(message):
     else:
         one_request_dict["flat_quolity"] = 1
         bot.send_message(message.from_user.id, "Введите минимальный порог цены (в долларах)")
-        bot.register_next_step_handler(message, handle_min_prise)       
+        bot.register_next_step_handler(message, handle_min_prise)
 def handle_flat_quolity(message):
     one_request_dict["flat_quolity"] = int(message.text)
     bot.send_message(message.from_user.id, "Введите минимальный порог цены (в долларах)")
     bot.register_next_step_handler(message, handle_min_prise)
 def handle_min_prise(message):
     one_request_dict["min_prise"] = 0
-    while one_request_dict["min_prise"] == 0:
-        try:
-            one_request_dict["min_prise"] = int(message.text)
-            bot.send_message(message.from_user.id, "Введите максимальный порог цены (в долларах)")
-        except Exception:
-            bot.send_message(message.from_user.id, 'Цифрами, пожалуйста');
-    bot.register_next_step_handler(message, handle_max_prise)
+    if message.text.isdigit():
+        one_request_dict["min_prise"] = int(message.text)
+        bot.send_message(message.from_user.id, "Введите максимальный порог цены (в долларах)")
+        bot.register_next_step_handler(message, handle_max_prise)
+    else:
+        bot.send_message(message.from_user.id, "Цифрами, пожалуйста. Попробуйте еще раз")
+        bot.register_next_step_handler(message, handle_min_prise)
 def handle_max_prise(message):
     one_request_dict["max_prise"] = 0
-    while one_request_dict["max_prise"] == 0:
-        try:
-            one_request_dict["max_prise"] = int(message.text)
-        except Exception:
-            bot.send_message(message.from_user.id, 'Цифрами, пожалуйста');
-    if one_request_dict["max_prise"] < one_request_dict["min_prise"]:
-        bot.send_message(message.from_user.id, 'Максимальный порог цены меньше минимального, попробуйте еще раз');
-        bot.register_next_step_handler(message, handle_min_prise)
+    if message.text.isdigit():
+        one_request_dict["max_prise"] = int(message.text)
+        if one_request_dict["max_prise"] < one_request_dict["min_prise"]:
+            bot.send_message(message.from_user.id, 'Максимальный порог цены меньше минимального, попробуйте еще раз');
+            bot.send_message(message.from_user.id, 'Введите минимальный порог цены (в долларах)');
+            bot.register_next_step_handler(message, handle_min_prise)
+        else:
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            btn1 = types.KeyboardButton("Да")
+            btn2 = types.KeyboardButton("Нет")
+            markup.add(btn1, btn2)
+            bot.send_message(message.chat.id, text="Показывать объявления только от собственника?".format(message.from_user), reply_markup=markup)
+            bot.register_next_step_handler(message, handle_owner)
     else:
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        btn1 = types.KeyboardButton("Да")
-        btn2 = types.KeyboardButton("Нет")
-        markup.add(btn1, btn2)
-        bot.send_message(message.chat.id, text="Показывать объявления только от собственника?".format(message.from_user), reply_markup=markup)
-        bot.register_next_step_handler(message, handle_owner)
+        bot.send_message(message.from_user.id, "Цифрами, пожалуйста. Попробуйте еще раз")
+        bot.register_next_step_handler(message, handle_max_prise)
 def handle_owner(message):
     one_request_dict["handle_owner"] = message.text
 one_request_dict = {}
 bot.infinity_polling()
+
 

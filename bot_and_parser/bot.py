@@ -2,6 +2,8 @@ from email import message
 from unicodedata import name
 import telebot
 from telebot import types
+from params import Data
+from parse import MyhomeParser
 
 #5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM
 bot = telebot.TeleBot("5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM")
@@ -19,8 +21,8 @@ def handle_town(message):
     if message.text.lower() not in town_list:
         bot.send_message(message.from_user.id, "Попробуйте ввести название города, например, Тбилиси")
     else:
-        one_request_dict["town"] = message.text
-        if one_request_dict["town"] == 'тбилиси' or 'tbilisi':
+        one_request_dict["town"] = message.text.title()
+        if one_request_dict["town"] in ['Тбилиси','Tbilisi']:
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             btn1 = types.KeyboardButton("Глдани")
             btn2 = types.KeyboardButton("Дидубе")
@@ -34,7 +36,7 @@ def handle_town(message):
             btn10 = types.KeyboardButton("Чугурети")
             btn11 = types.KeyboardButton("Окрестности Тбилиси")
             markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn10, btn11)
-        if one_request_dict["town"] == 'батуми' or 'batumi':
+        if one_request_dict["town"] in ['Батуми',  'Batumi']:
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             btn1 = types.KeyboardButton("Аэропорт")
             btn2 = types.KeyboardButton("Агмашенебели")
@@ -47,7 +49,7 @@ def handle_town(message):
             btn9 = types.KeyboardButton("Химшиашвили")
             btn10 = types.KeyboardButton("Джавахишвили Район")
             markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn10)
-        if one_request_dict["town"] == 'кутаиси' or 'kutaisi':
+        if one_request_dict["town"] in ['Кутаиси', 'Kutaisi']:
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             btn1 = types.KeyboardButton("Поселок Авангарди")
             btn2 = types.KeyboardButton("Поселок Автокархана")
@@ -131,6 +133,13 @@ def handle_max_prise(message):
         bot.register_next_step_handler(message, handle_max_prise)
 def handle_owner(message):
     one_request_dict["handle_owner"] = message.text
+    d = Data(one_request_dict)
+    last_forms = d.formats()
+    print(last_forms)
+    MyParse = MyhomeParser(last_forms)
+    result = MyParse.parse_all()
+    for i in result:
+        print(i)
 one_request_dict = {}
 bot.infinity_polling()
 

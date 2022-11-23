@@ -1,0 +1,81 @@
+import bs4
+import requests
+import urllib.parse
+
+
+class MyhomeParser:
+    def __init__(self, params):
+        self.params = params
+        self.session = requests.Session()
+        self.session.headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36'
+        }
+
+    def get_page(self, page: int = None):
+        temp_params = self.params.copy()
+        if page and page > 1:
+            temp_params = self.params.copy()
+            temp_params['page'] = page
+        url = 'https://www.myhome.ge/ru/s'
+        r = self.session.get(url, params=temp_params)
+        return r.text
+
+    def get_pagination_limit(self):
+        text = self.get_page()
+        soup = bs4.BeautifulSoup(text, 'lxml')
+        pages = soup.select('a.page-link')
+        last_page = pages[-1]
+        href = last_page.get('href')
+        r = urllib.parse.urlparse(href)
+        s = ''
+        for i in r[2]:
+            if i.isdigit():
+                s += i
+        return int(s)
+
+    def get_blocks(self, page: int = None):
+        text = self.get_page(page=page)
+        soup = bs4.BeautifulSoup(text, 'lxml')
+        container = soup.select('div.statement-card')
+        all_block = []
+        for item in container:
+            block = self.parse_block(item=item)
+            if block != None:
+                all_block.append(block)
+
+        return all_block
+
+    def parse_block(self, item):
+        try:
+            url_block = item.select_one('a.card-container')
+            href = url_block.get('href')
+            url = href
+            title_block = item.select_one('h5.card-title')
+            title = title_block.string.strip()
+            price_block = item.select_one('b.item-price-gel')
+            price_block2 = item.select_one('b.item-price-usd')
+            priceD = price_block.string.strip() + ' GEL'
+            priceL = price_block2.string.strip() + ' $'
+            date_block = item.select_one('div.statement-date')
+            date = date_block.string.strip()
+
+            return [title, url, priceL, priceD, date]
+
+        except AttributeError:
+
+            return None
+
+    def parse_all(self):
+        limit = self.get_pagination_limit()
+        print(f'Всего страниц {limit}')
+        block_all = []
+        for i in range(1, limit + 1):
+            block_all += self.get_blocks(page=i)
+
+        return block_all
+
+
+
+
+
+

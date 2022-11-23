@@ -1,5 +1,5 @@
 class Data:
-    def __init__(self):
+    def __init__(self, forms):
         self.city = {'Тбилиси':
                          ['Тбилиси', 1996871],
                      'Батуми':
@@ -19,37 +19,30 @@ class Data:
                              'Надзаладеви': 688137211,
                              'Сабуртало': 687602533,
                              'Самгори': 688330506,
-                             'Чугурети': 687618311
-                             }
-                        }
+                             'Чугурети': 687618311}}
         self.type_s = {'Продажа': 1, 'Аренда': 3, 'Аренда посуточно': 7}
         self.type_s_towr = {'Квартира': 1, 'Дома и дачи': 2, 'Коммерческая площадь': 3}
+        self.forms = forms
 
-    def formats(self, forms):
-        lastForm = {
-            'Keyword': self.city[forms['Город']][0],
-            'cities': self.city[forms['Город']][1],
-            'regions': self.regions[forms['Город']][forms['Регион']],
-            'fullregions': self.regions[forms['Город']][forms['Регион']],
-            'AdType': self.type_s[forms['Тип поиска']],
-            'PrTypeID%5B%5D': self.type_s_towr[forms['Тип жилья']],
-            'SortID': 1,
-        }
-        if forms['Собственник'] == 'Да':
+    def formats(self):
+        lastForm = {'Keyword': self.city[self.forms['town']][0],
+                    'cities': self.city[self.forms['town']][1],
+                    'regions': self.regions[self.forms['town']][self.forms['district']],
+                    'fullregions': self.regions[self.forms['town']][self.forms['district']],
+                    'AdType': 3,
+                    'PrTypeID%5B%5D': self.type_s_towr[self.forms['type_of_house']],
+                    'SortID': 1,
+                    'FCurrencyID': 1,
+                    'RoomNums%5B%5D': int(self.forms['flat_quolity']),
+                    'FPriceFrom': int(self.forms['min_prise']),
+                    'FPriceTo': int(self.forms['max_prise'])}
+        if self.forms['handle_owner'] == 'Да':
             lastForm['OwnerTypeID'] = 1
-        if forms['Сортировка по цене'] == 'Да':
-            lastForm['FPriceFrom'] = forms['Макс - мин цена, валюта'][1]
-            lastForm['FPriceTo'] = forms['Макс - мин цена, валюта'][0]
-            if forms['Макс - мин цена, валюта'][2] == 'Доллар':
-                lastForm['FCurrencyID'] = 1
-            elif forms['Макс - мин цена, валюта'][2] == 'Лари':
-                lastForm['FCurrencyID'] = 3
+
+            # if add bot check $ or lari
+            # if forms['Макс - мин цена, валюта'][2] == 'Доллар':
+            #     lastForm['FCurrencyID'] = 1
+            # elif forms['Макс - мин цена, валюта'][2] == 'Лари':
+            #     lastForm['FCurrencyID'] = 3
 
         return lastForm
-
-
-x = Data()
-print(x.formats({'Город': 'Тбилиси', 'Регион': 'Глдани', 'Тип поиска': 'Аренда', 'Тип жилья': 'Квартира',
-           'Сортировка по цене': 'Да',
-           'Макс - мин цена, валюта': [500, 300, 'Доллар'], 'Собственник': 'Да'}))
-# Если лари то FCurrencyID 3, если доллар 1

@@ -7,8 +7,7 @@ class Data:
                      'Кутаиси':
                          ['Кутаиси', 8742174],
                      'Рустави':
-                         ['Рустави', 5997314]
-                     }
+                         ['Рустави', 5997314]}
         self.regions = {'Тбилиси':
                             {'Глдани': 687578743,
                              'Дидубе': 687611312,
@@ -33,8 +32,28 @@ class Data:
                              "Химшиашвили": 776463102,
                              "Джавахишвили Район": 776465448},
                         'Кутаиси':
-                            {}
-                        }
+                            {"Поселок Авангарди": 204509374,
+                             "Поселок Автокархана": 204528515,
+                             "Поселок Асатиани": 206352209,
+                             "Пос. Агмашенебели": 206348743,
+                             "Балахвани": 2145069828,
+                             "Бжолеби": 206349513,
+                             "Холм Габашвили": 206345188,
+                             "Гора Сакуслиа": 206349304,
+                             "Гуматеси": 2163598831,
+                             "Вакисубани": 204509275,
+                             "Застава": 5279555,
+                             "Мепесутубани": 204507826,
+                             "Мцванеквавила": 206347371,
+                             "Поселок Никея": 204509276,
+                             "Ниноцминда": 206352104,
+                             "Рионгеси": 6002742,
+                             "Сафичхиа": 2163556035,
+                             "Сагориа": 204508541,
+                             "Укимериони": 206345498,
+                             "Кроника": 206349898,
+                             "Поселок Чавчавадзе": 206348604,
+                             "Чома": 206393819}}
         self.type_s = {'Продажа': 1, 'Аренда': 3, 'Аренда посуточно': 7}
         self.type_s_towr = {'Квартира': 1, 'Дома и дачи': 2, 'Коммерческая площадь': 3}
         self.forms = forms
@@ -42,9 +61,10 @@ class Data:
     def formats(self):
         lastForm = {'Keyword': self.city[self.forms['town']][0],
                     'cities': self.city[self.forms['town']][1],
+                    'GID': self.city[self.forms['town']][1],
                     'regions': self.regions[self.forms['town']][self.forms['district']],
                     'fullregions': self.regions[self.forms['town']][self.forms['district']],
-                    'AdType': 3,
+                    'AdTypeID': 3,
                     'PrTypeID%5B%5D': self.type_s_towr[self.forms['type_of_house']],
                     'SortID': 1,
                     'FCurrencyID': 1,
@@ -53,6 +73,9 @@ class Data:
                     'FPriceTo': int(self.forms['max_prise'])}
         if self.forms['handle_owner'] == 'Да':
             lastForm['OwnerTypeID'] = 1
+        if self.forms['town'] != 'тбилиси':
+            lastForm['districts'] = lastForm.pop('regions')
+            del lastForm['fullregions']
 
             # if add bot check $ or lari
             # if forms['Макс - мин цена, валюта'][2] == 'Доллар':

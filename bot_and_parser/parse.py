@@ -1,6 +1,7 @@
 import bs4
 import requests
 import urllib.parse
+import re
 
 
 class MyhomeParser:
@@ -58,8 +59,14 @@ class MyhomeParser:
             priceL = price_block2.string.strip() + ' $'
             date_block = item.select_one('div.statement-date')
             date = date_block.string.strip()
+            images = item.select_one('img.swiper-lazy')
+            images = images.get('data-src')
+            images1 = re.sub('thumbs', 'large', images)
+            images2 = re.sub('1.jpg', '2.jpg', images1)
+            images3 = re.sub('1.jpg', '3.jpg', images1)
 
-            return [title, url, priceL, priceD, date]
+
+            return [title, url, priceL, priceD, date, images1, images2, images3]
 
         except AttributeError:
 

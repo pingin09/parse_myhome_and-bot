@@ -13,6 +13,19 @@ town_list = ['тбилиси', 'кутаиси', 'батуми', 'рустави
 @bot.message_handler(commands=["start"])
 def start(m, res=False):
     bot.send_message(m.chat.id, 'В каком городе вы ищете жилье?')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton("Тбилиси")
+    btn2 = types.KeyboardButton("Кутаиси")
+    btn3 = types.KeyboardButton("Батуми")
+    btn4 = types.KeyboardButton("Рустави")
+    btn5 = types.KeyboardButton("Мцхета")
+    btn6 = types.KeyboardButton("Боржоми")
+    btn7 = types.KeyboardButton("Кобулети")
+    btn8 = types.KeyboardButton("")
+    btn9 = types.KeyboardButton("")
+    btn10 = types.KeyboardButton("")
+    btn11 = types.KeyboardButton("")
+    markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn10, btn11)
 
 one_request_dict = {} #сформировать словарь ID/one_request_dict
 

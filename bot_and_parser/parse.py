@@ -79,7 +79,7 @@ class MyhomeParser:
         for i in range(1, limit + 1):
             block_all += self.get_blocks(page=i)
 
-        return block_all
+        return block_all, limit
 
 
 

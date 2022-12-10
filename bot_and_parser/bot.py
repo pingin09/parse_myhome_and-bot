@@ -9,7 +9,7 @@ from parse import MyhomeParser
 bot = telebot.TeleBot("5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM")
 
 town_list = ['тбилиси', 'кутаиси', 'батуми', 'рустави', 'мцхета', 'боржоми', 'кобулети']
-tbilisi_district_list = ["глдани", "дидубе", "ваке", "исани", "крцанисси", "мтацминда", "надзаладеви", "сабуртало",
+tbilisi_district_list = ["глдани", "дидубе", "ваке", "исани", "крцанисси", "мтанцминда", "надзаладеви", "сабуртало",
                          "самгори", "чугурети", "окрестности тбилиси"]
 batumi_disrtict_list = ["аэропорт", "агмашенебели", "багратиони", "бони-городокский район", "поселок тамар",
                         "кахаберийский район", "руставельский район", "старый батуми", "химшиашвили",
@@ -280,32 +280,19 @@ def handle_owner(message):
         one_request_dict["handle_owner"] = message.text
         bot.send_photo(message.chat.id, 'https://pbs.twimg.com/media/C5IoAwpWAAAa82G.jpg:large',
                        caption="Тип жилья | Адрес | Цена | Телефон https://qna.habr.com/q/739457")
-        bot.register_next_step_handler(message, import_func)
-def import_func(message):
-    d = Data(one_request_dict)
-    last_forms = d.formats()
-    print(message)
-    MyParse = MyhomeParser(last_forms)
-    result = MyParse.parse_all()
-    max_list = result[1]
-    all_block = result[0]
-    new_dict = []
-    page = max_list // 5
-    page2 = max_list % 5
-    temp = 0
-    for i in range(page):
-        for i1 in range(5):
-            new_dict[i].append(all_block[temp])
-            temp += 1
-    for i in range(page2):
-        new_dict[page].append(all_block[max_list - page -1 + i])
-    for i3 in new_dict:
-        print(i3)
+
+
+
 one_request_dict = {}
 bot.infinity_polling()
+d = Data(one_request_dict)
+last_forms = d.formats()
+print(message)
+MyParse = MyhomeParser(last_forms)
+result = MyParse.parse_all()
 
-def output(message):
-    bot.send_photo(message.chat.id, 'https://pbs.twimg.com/media/C5IoAwpWAAAa82G.jpg:large',
-                   caption="Тип жилья | Адрес | Цена | Телефон https://qna.habr.com/q/739457")
+# def output(message):
+#     bot.send_photo(message.chat.id, 'https://pbs.twimg.com/media/C5IoAwpWAAAa82G.jpg:large',
+#                    caption="Тип жилья | Адрес | Цена | Телефон https://qna.habr.com/q/739457")
 
 

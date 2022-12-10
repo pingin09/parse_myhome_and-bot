@@ -78,8 +78,18 @@ class MyhomeParser:
         block_all = []
         for i in range(1, limit + 1):
             block_all += self.get_blocks(page=i)
-
-        return block_all, limit
+        value_str = len(block_all)
+        temp = value_str // 5
+        temp2 = value_str % 5
+        block_all_group = []
+        if temp2 == 0:
+            block_all_group = [block_all[i: i+5] for i in range(0,value_str, 5)]
+        elif temp2 != 0:
+            block_all_group = [block_all[i: i+5] for i in range(0,value_str, 5)]
+        print(value_str)
+        for i in block_all_group:
+            print(i)
+        return block_all_group
 
 
 

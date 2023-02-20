@@ -78,7 +78,7 @@ class Data:
             del lastForm['fullregions']
 
             # if add bot check $ or lari
-            # if forms['Макс - мин цена, валюта'][2] == 'Доллар':
+            # if fo сrms['Макс - мин цена, валюта'][2] == 'Доллар':
             #     lastForm['FCurrencyID'] = 1
             # elif forms['Макс - мин цена, валюта'][2] == 'Лари':
             #     lastForm['FCurrencyID'] = 3

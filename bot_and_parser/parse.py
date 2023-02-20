@@ -50,7 +50,7 @@ class MyhomeParser:
         try:
             url_block = item.select_one('a.card-container')
             href = url_block.get('href')
-            url = href
+            url = href[0:37]
             title_block = item.select_one('h5.card-title')
             title = title_block.string.strip()
             price_block = item.select_one('b.item-price-gel')
@@ -64,9 +64,11 @@ class MyhomeParser:
             images1 = re.sub('thumbs', 'large', images)
             images2 = re.sub('1.jpg', '2.jpg', images1)
             images3 = re.sub('1.jpg', '3.jpg', images1)
+            adress = item.select_one('.address')
+            adress = adress.get("title")
 
-
-            return [title, url, priceL, priceD, date, images1, images2, images3]
+            return {"title": title, "url": url, "priceL": priceL, "priceD": priceD, "date": date, "images1": images1,
+                    "images2": images2, "images3": images3, 'adress': adress}
 
         except AttributeError:
 
@@ -83,16 +85,10 @@ class MyhomeParser:
         temp2 = value_str % 5
         block_all_group = []
         if temp2 == 0:
-            block_all_group = [block_all[i: i+5] for i in range(0,value_str, 5)]
+            block_all_group = [block_all[i: i + 5] for i in range(0, value_str, 5)]
         elif temp2 != 0:
-            block_all_group = [block_all[i: i+5] for i in range(0,value_str, 5)]
+            block_all_group = [block_all[i: i + 5] for i in range(0, value_str, 5)]
         print(value_str)
         for i in block_all_group:
             print(i)
         return block_all_group
-
-
-
-
-
-

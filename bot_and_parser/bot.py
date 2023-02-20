@@ -5,7 +5,7 @@ from telebot import types
 from params import Data
 from parse import MyhomeParser
 
-#5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM
+# 5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM
 bot = telebot.TeleBot("5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM")
 
 town_list = ['тбилиси', 'кутаиси', 'батуми', 'рустави', 'мцхета', 'боржоми', 'кобулети']
@@ -16,14 +16,16 @@ batumi_disrtict_list = ["аэропорт", "агмашенебели", "баг�
                         "джавахишвили район"]
 kutaisi_district_list = ["поселок автокархана", "поселок асатиани", "пос. агмашенебели", "балахвани", "бжолеби",
                          "холм габашвили", "гора сакуслиа", "гуматеси", "вакисубани", "застава", "мепесутубани",
-                         "мцванеквавила", "поселок никея", "ниноцминда", "рионгеси", "сафичхиа", "сагориа", "укимериони", "кроника",
+                         "мцванеквавила", "поселок никея", "ниноцминда", "рионгеси", "сафичхиа", "сагориа",
+                         "укимериони", "кроника",
                          "поселок чавчавадзе", "чома"]
 type_house_list = ["Комната", "Дом", "Квартира"]
-flat_quolity_list = ["1","2","3","4"]
+flat_quolity_list = ["1", "2", "3", "4"]
 owner_list = ["Да", "Нет"]
 
-#@bot.message_handler(commands=["start"])
-@bot.message_handler(content_types=["text"])
+
+# @bot.message_handler(commands=["start"])
+@bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     btn1 = types.KeyboardButton("Тбилиси")
@@ -34,8 +36,11 @@ def start(message):
     btn6 = types.KeyboardButton("Боржоми")
     btn7 = types.KeyboardButton("Кобулети")
     markup.add(btn1, btn2, btn3, btn4, btn5, btn6, btn7)
-    bot.send_message(message.from_user.id, "В каком городе вы ищете жилье?".format(message.from_user), reply_markup=markup)
+    bot.send_message(message.from_user.id, "В каком городе вы ищете жилье?".format(message.from_user),
+                     reply_markup=markup)
     bot.register_next_step_handler(message, handle_town)
+
+
 def handle_town(message):
     if message.text.lower() not in town_list:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -120,9 +125,14 @@ def handle_town(message):
             btn20 = types.KeyboardButton("Кроника")
             btn21 = types.KeyboardButton("Поселок Чавчавадзе")
             btn22 = types.KeyboardButton("Чома")
-            markup.add(btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn10, btn11, btn12, btn13, btn14, btn15, btn16, btn17, btn18, btn19, btn20, btn21, btn22)
-            bot.send_message(message.from_user.id, "Какой район "+one_request_dict["town"]+" вас интересует?".format(message.from_user), reply_markup=markup)
+            markup.add(btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btn10, btn11, btn12, btn13, btn14, btn15, btn16,
+                       btn17, btn18, btn19, btn20, btn21, btn22)
+            bot.send_message(message.from_user.id,
+                             "Какой район " + one_request_dict["town"] + " вас интересует?".format(message.from_user),
+                             reply_markup=markup)
             bot.register_next_step_handler(message, handle_district)
+
+
 def handle_district(message):
     if message.text.lower() not in tbilisi_district_list and one_request_dict["town"] == 'Тбилиси':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -198,6 +208,8 @@ def handle_district(message):
         bot.send_message(message.chat.id, text="Вы ищете квартиру, комнату или дом?".format(message.from_user),
                          reply_markup=markup)
         bot.register_next_step_handler(message, handle_type_of_house)
+
+
 def handle_type_of_house(message):
     if message.text not in type_house_list:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -218,12 +230,15 @@ def handle_type_of_house(message):
             btn3 = types.KeyboardButton("3")
             btn4 = types.KeyboardButton("4")
             markup.add(btn1, btn2, btn3, btn4)
-            bot.send_message(message.chat.id, text="Сколько вам нужно комнат?".format(message.from_user), reply_markup=markup)
+            bot.send_message(message.chat.id, text="Сколько вам нужно комнат?".format(message.from_user),
+                             reply_markup=markup)
             bot.register_next_step_handler(message, handle_flat_quolity)
         else:
             one_request_dict["flat_quolity"] = 1
             bot.send_message(message.from_user.id, "Введите минимальный порог цены (в долларах)")
             bot.register_next_step_handler(message, handle_min_prise)
+
+
 def handle_flat_quolity(message):
     if message.text not in flat_quolity_list:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -239,6 +254,8 @@ def handle_flat_quolity(message):
         one_request_dict["flat_quolity"] = int(message.text)
         bot.send_message(message.from_user.id, "Введите минимальный порог цены (в долларах)")
         bot.register_next_step_handler(message, handle_min_prise)
+
+
 def handle_min_prise(message):
     one_request_dict["min_prise"] = 0
     if message.text.isdigit():
@@ -248,6 +265,8 @@ def handle_min_prise(message):
     else:
         bot.send_message(message.from_user.id, "Цифрами, пожалуйста. Попробуйте еще раз")
         bot.register_next_step_handler(message, handle_min_prise)
+
+
 def handle_max_prise(message):
     one_request_dict["max_prise"] = 0
     if message.text.isdigit():
@@ -261,11 +280,15 @@ def handle_max_prise(message):
             btn1 = types.KeyboardButton("Да")
             btn2 = types.KeyboardButton("Нет")
             markup.add(btn1, btn2)
-            bot.send_message(message.chat.id, text="Показывать объявления только от собственника?".format(message.from_user), reply_markup=markup)
+            bot.send_message(message.chat.id,
+                             text="Показывать объявления только от собственника?".format(message.from_user),
+                             reply_markup=markup)
             bot.register_next_step_handler(message, handle_owner)
     else:
         bot.send_message(message.from_user.id, "Цифрами, пожалуйста. Попробуйте еще раз")
         bot.register_next_step_handler(message, handle_max_prise)
+
+
 def handle_owner(message):
     if message.text not in owner_list:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
@@ -278,21 +301,63 @@ def handle_owner(message):
         bot.register_next_step_handler(message, handle_owner)
     else:
         one_request_dict["handle_owner"] = message.text
-        bot.send_photo(message.chat.id, 'https://pbs.twimg.com/media/C5IoAwpWAAAa82G.jpg:large',
-                       caption="Тип жилья | Адрес | Цена | Телефон https://qna.habr.com/q/739457")
+        one_request_dict['count_page'] = 0
+        d = Data(one_request_dict)
+        last_forms = d.formats()
+        print(message)
+        MyParse = MyhomeParser(last_forms)
+        result = MyParse.parse_all()
+        one_request_dict['result'] = result
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        btn1 = types.KeyboardButton("Показать")
+        markup.add(btn1)
+        bot.send_message(message.chat.id, text='Показать варианты', reply_markup=markup)
+        bot.register_next_step_handler(message, conclusion)
+
+
+def conclusion(message):
+    result = one_request_dict['result']
+    if one_request_dict['count_page'] == 0:
+        message.text = 'Вперёд'
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    if one_request_dict['count_page'] == len(one_request_dict['result'])-1:
+        btn1 = types.KeyboardButton("Назад")
+        btn3 = types.KeyboardButton('Новый поиск')
+        markup.add(btn1,btn3)
+    elif one_request_dict['count_page'] == 0:
+        btn2 = types.KeyboardButton("Вперёд")
+        btn3 = types.KeyboardButton('Новый поиск')
+        markup.add(btn2, btn3)
+    else:
+        btn1 = types.KeyboardButton("Назад")
+        btn3 = types.KeyboardButton('Новый поиск')
+        btn2 = types.KeyboardButton("Вперёд")
+        markup.add(btn1, btn2, btn3)
+    if message.text != 'Новый поиск':
+        for block in result[one_request_dict['count_page']]:
+            bot.send_photo(message.chat.id, block['images1'],
+                           caption=f"{block['title']} | {block['adress']} | {block['priceD']} |"
+                                   f" Телефон {block['url']}", reply_markup=markup)
+    print(message.text)
+    if message.text == 'Назад':
+        one_request_dict['count_page'] -= 1
+        bot.register_next_step_handler(message, conclusion)
+    elif message.text == 'Вперёд':
+        one_request_dict['count_page'] += 1
+        bot.register_next_step_handler(message, conclusion)
+    elif message.text == 'Новый поиск':
+        message.text = '/start'
+
+
+
+
+
 
 
 
 one_request_dict = {}
 bot.infinity_polling()
-d = Data(one_request_dict)
-last_forms = d.formats()
-print(message)
-MyParse = MyhomeParser(last_forms)
-result = MyParse.parse_all()
 
 # def output(message):
 #     bot.send_photo(message.chat.id, 'https://pbs.twimg.com/media/C5IoAwpWAAAa82G.jpg:large',
 #                    caption="Тип жилья | Адрес | Цена | Телефон https://qna.habr.com/q/739457")
-
-

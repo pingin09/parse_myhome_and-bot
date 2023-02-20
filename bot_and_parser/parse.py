@@ -2,6 +2,7 @@ import bs4
 import requests
 import urllib.parse
 import re
+from more_itertools import chunked
 
 
 class MyhomeParser:
@@ -80,14 +81,7 @@ class MyhomeParser:
         block_all = []
         for i in range(1, limit + 1):
             block_all += self.get_blocks(page=i)
-        value_str = len(block_all)
-        temp2 = value_str % 5
-        block_all_group = []
-        if temp2 == 0:
-            block_all_group = [block_all[i: i + 5] for i in range(0, value_str, 5)]
-        elif temp2 != 0:
-            block_all_group = [block_all[i: i + 5] for i in range(0, value_str, 5)]
-        print(value_str)
-        for i in block_all_group:
-            print(i)
+        block_all_group = list(chunked(block_all, 5))
+        print(*block_all_group)
+        print(f'Найдено{len(block_all)}')
         return block_all_group

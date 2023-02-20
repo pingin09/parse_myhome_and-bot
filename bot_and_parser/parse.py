@@ -23,6 +23,7 @@ class MyhomeParser:
         return r.text
 
     def get_pagination_limit(self):
+        """"Узнаём сколько станиц всего"""
         text = self.get_page()
         soup = bs4.BeautifulSoup(text, 'lxml')
         pages = soup.select('a.page-link')

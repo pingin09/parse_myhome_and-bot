@@ -55,8 +55,8 @@ class MyhomeParser:
             title = title_block.string.strip()
             price_block = item.select_one('b.item-price-gel')
             price_block2 = item.select_one('b.item-price-usd')
-            priceD = price_block.string.strip() + ' GEL'
-            priceL = price_block2.string.strip() + ' $'
+            priceL = price_block.string.strip() + ' GEL'
+            priceD = price_block2.string.strip() + ' $'
             date_block = item.select_one('div.statement-date')
             date = date_block.string.strip()
             images = item.select_one('img.swiper-lazy')
@@ -81,7 +81,6 @@ class MyhomeParser:
         for i in range(1, limit + 1):
             block_all += self.get_blocks(page=i)
         value_str = len(block_all)
-        temp = value_str // 5
         temp2 = value_str % 5
         block_all_group = []
         if temp2 == 0:

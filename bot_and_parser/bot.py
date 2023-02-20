@@ -4,9 +4,9 @@ import telebot
 from telebot import types
 from params import Data
 from parse import MyhomeParser
+from token_tbot import id as id_token
 
-# 5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM
-bot = telebot.TeleBot("5624965452:AAGrdQGCu8O6AzbiHr7snSuJXi884-EEuHM")
+bot = telebot.TeleBot(id_token)
 
 town_list = ['тбилиси', 'кутаиси', 'батуми', 'рустави', 'мцхета', 'боржоми', 'кобулети']
 tbilisi_district_list = ["глдани", "дидубе", "ваке", "исани", "крцанисси", "мтанцминда", "надзаладеви", "сабуртало",
@@ -320,10 +320,10 @@ def conclusion(message):
     if one_request_dict['count_page'] == 0:
         message.text = 'Вперёд'
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
-    if one_request_dict['count_page'] == len(one_request_dict['result'])-1:
+    if one_request_dict['count_page'] == len(one_request_dict['result']) - 1:
         btn1 = types.KeyboardButton("Назад")
         btn3 = types.KeyboardButton('Новый поиск')
-        markup.add(btn1,btn3)
+        markup.add(btn1, btn3)
     elif one_request_dict['count_page'] == 0:
         btn2 = types.KeyboardButton("Вперёд")
         btn3 = types.KeyboardButton('Новый поиск')
@@ -347,12 +347,6 @@ def conclusion(message):
         bot.register_next_step_handler(message, conclusion)
     elif message.text == 'Новый поиск':
         message.text = '/start'
-
-
-
-
-
-
 
 
 one_request_dict = {}
